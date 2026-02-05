@@ -286,11 +286,15 @@ class ExactEvaluation(EvaluationStrategy):
                     break
                 # Check for sufficient overlap with min threshold
                 if self._has_sufficient_overlap(pred, true):
-                    result.incorrect += 1
-                    indices.incorrect_indices.append((instance_index, pred_idx))
-                    matched_true.add(true_idx)
+                    if not found_incorrect:
+                        incorrect_true_idx = true_idx
+                        incorrect_pred_idx = pred_idx
                     found_incorrect = True
-                    break
+
+            if not found_match and found_incorrect:
+                result.incorrect += 1
+                indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
+                matched_true.add(incorrect_true_idx)
 
             if not found_match and not found_incorrect:
                 result.spurious += 1
