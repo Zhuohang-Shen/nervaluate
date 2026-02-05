@@ -149,6 +149,7 @@ class PartialEvaluation(EvaluationStrategy):
 
         for pred_idx, pred in enumerate(pred_entities):
             found_match = False
+            found_partial = False
 
             for true_idx, true in enumerate(true_entities):
                 if true_idx in matched_true:
@@ -159,14 +160,20 @@ class PartialEvaluation(EvaluationStrategy):
                     if pred.start == true.start and pred.end == true.end:
                         result.correct += 1
                         indices.correct_indices.append((instance_index, pred_idx))
-                    else:
-                        result.partial += 1
-                        indices.partial_indices.append((instance_index, pred_idx))
-                    matched_true.add(true_idx)
-                    found_match = True
-                    break
+                        matched_true.add(true_idx)
+                        found_match = True
+                        break
+                    elif not found_partial:
+                        partial_pred_idx = pred_idx
+                        partial_true_idx = true_idx
+                        found_partial = True
+                    
+            if not found_match and found_partial:
+                result.partial += 1
+                indices.partial_indices.append((instance_index, partial_pred_idx))
+                matched_true.add(partial_true_idx)
 
-            if not found_match:
+            if not found_match and not found_partial:
                 result.spurious += 1
                 indices.spurious_indices.append((instance_index, pred_idx))
 
