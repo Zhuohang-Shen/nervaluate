@@ -698,6 +698,40 @@ class TestPartialEvaluation:
         assert result_indices.missed_indices == []
         assert result_indices.spurious_indices == []
 
+    def test_perfect_match_nested(self, base_sequence_nested):
+        evaluator = PartialEvaluation()
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
+    def test_perfect_match_nested_reverse_order(self, base_sequence_nested):
+        evaluator = PartialEvaluation()
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)[::-1]
+        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
     def test_missed_entity(self, base_sequence):
         """Test case: One entity is missed in prediction."""
         true = create_entities_from_bio(base_sequence)
@@ -715,6 +749,25 @@ class TestPartialEvaluation:
         assert result_indices.incorrect_indices == []
         assert result_indices.partial_indices == []
         assert result_indices.missed_indices == [(0, 1)]
+        assert result_indices.spurious_indices == []
+
+    def test_missed_entity_nested(self, base_sequence_nested):
+        """Test case: One entity is missed in prediction."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)[1:]
+
+        evaluator = PartialEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+
+        assert result.correct == 3
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 1
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == [(0, 0)]
         assert result_indices.spurious_indices == []
 
     def test_wrong_label(self, base_sequence):
@@ -736,6 +789,26 @@ class TestPartialEvaluation:
         assert result_indices.missed_indices == []
         assert result_indices.spurious_indices == []
 
+    def test_wrong_label_nested(self, base_sequence_nested):
+        """Test case: Entity with wrong label."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        pred[1].label = "DATE"
+
+        evaluator = PartialEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
     def test_wrong_boundary(self, base_sequence):
         """Test case: Entity with wrong boundary."""
         true = create_entities_from_bio(base_sequence)
@@ -750,6 +823,26 @@ class TestPartialEvaluation:
         assert result.missed == 0
         assert result.spurious == 0
         assert result_indices.correct_indices == [(0, 0)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == [(0, 1)]
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
+    def test_wrong_boundary_nested(self, base_sequence_nested):
+        """Test case: Entity with wrong boundary."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        pred[1].end = 30
+
+        evaluator = PartialEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+
+        assert result.correct == 3
+        assert result.incorrect == 0
+        assert result.partial == 1
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 2), (0, 3)]
         assert result_indices.incorrect_indices == []
         assert result_indices.partial_indices == [(0, 1)]
         assert result_indices.missed_indices == []
