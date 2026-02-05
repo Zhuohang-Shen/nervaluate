@@ -41,6 +41,20 @@ class EvaluationStrategy(ABC):
         # Calculate percentage based on true entity span
         return (overlap_span / true_span) * 100.0
 
+    @staticmethod
+    def _calculate_boundaries_mean_gap(pred: Entity, true: Entity) -> float:
+        """
+        Calculate mean gap between predicted and true entities boundaries.
+
+        Returns:
+            Mean gap between predicted and true boundaries
+        """
+        # Calculate boundaries gaps
+        gap_starts = abs(pred.start - true.start)
+        gap_ends = abs(pred.end - true.end)
+        
+        return (gap_starts + gap_ends)/2
+
     def _has_sufficient_overlap(self, pred: Entity, true: Entity) -> bool:
         """Check if entities have sufficient overlap based on threshold."""
         overlap_percentage = EvaluationStrategy._calculate_overlap_percentage(pred, true)
@@ -190,6 +204,7 @@ class EntityTypeEvaluation(EvaluationStrategy):
         for pred_idx, pred in enumerate(pred_entities):
             found_match = False
             found_incorrect = False
+            current_match_boundaries_gap = None
 
             for true_idx, true in enumerate(true_entities):
                 if true_idx in matched_true:
@@ -197,17 +212,28 @@ class EntityTypeEvaluation(EvaluationStrategy):
 
                 # Check for sufficient overlap with min threshold
                 if self._has_sufficient_overlap(pred, true):
+                    boundaries_mean_gap = self._calculate_boundaries_mean_gap(pred,true)
                     if pred.label == true.label:
-                        result.correct += 1
-                        indices.correct_indices.append((instance_index, pred_idx))
-                        matched_true.add(true_idx)
-                        found_match = True
-                    else:
-                        result.incorrect += 1
-                        indices.incorrect_indices.append((instance_index, pred_idx))
-                        matched_true.add(true_idx)
+                        if current_match_boundaries_gap == None or boundaries_mean_gap < current_match_boundaries_gap:
+                            correct_true_idx = true_idx
+                            correct_pred_idx = pred_idx
+                            current_match_boundaries_gap = boundaries_mean_gap
+                            found_match = True
+
+                    elif not found_incorrect:
+                        incorrect_true_idx = true_idx
+                        incorrect_pred_idx = pred_idx
                         found_incorrect = True
-                    break
+
+            if found_match:
+                result.correct += 1
+                indices.correct_indices.append((instance_index, correct_pred_idx))
+                matched_true.add(correct_true_idx)
+
+            if not found_match and found_incorrect:
+                result.incorrect += 1
+                indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
+                matched_true.add(incorrect_true_idx)
 
             if not found_match and not found_incorrect:
                 result.spurious += 1
