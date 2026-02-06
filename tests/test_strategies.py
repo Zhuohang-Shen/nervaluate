@@ -39,8 +39,8 @@ def base_sequence():
 @pytest.fixture
 def base_sequence_nested():
     """Base sequence: 'The Treaty of Westphalia negotiations concluded in 1648.'
-    first_level_entity: The Treaty of Westphalia negotiations
-    second_level_entity: The Treaty of Westphalia
+    first_level_entity: Treaty of Westphalia negotiations
+    second_level_entity: Treaty of Westphalia
     third_level_entity: Westphalia
     other_entity: 1648
     """
@@ -75,6 +75,7 @@ class TestStrictEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested(self, base_sequence_nested):
+        """Test case: Perfect match of all entities with nested entities."""
         evaluator = StrictEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
@@ -92,6 +93,7 @@ class TestStrictEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested_reverse_order(self, base_sequence_nested):
+        """Test case: Perfect match of all entities in reverse order, with nested entities."""
         evaluator = StrictEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
@@ -128,7 +130,7 @@ class TestStrictEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_missed_entity_nested(self, base_sequence_nested):
-        """Test case: One entity is missed in prediction."""
+        """Test case: First level entity is missed in prediction."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[1:]
 
@@ -166,7 +168,7 @@ class TestStrictEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_label_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong label."""
+        """Test case: Nested entity with wrong label."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].label = "DATE"
@@ -205,7 +207,7 @@ class TestStrictEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_boundary_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong boundary."""
+        """Test case: Nested entity with wrong boundary."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].end = 30
@@ -286,6 +288,7 @@ class TestEntityTypeEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested(self, base_sequence_nested):
+        """Test case: Perfect match of all entities with nested entities."""
         evaluator = EntityTypeEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
@@ -303,6 +306,7 @@ class TestEntityTypeEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested_reverse_order(self, base_sequence_nested):
+        """Test case: Perfect match of all entities in reverse order, with nested entities."""
         evaluator = EntityTypeEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
@@ -339,7 +343,7 @@ class TestEntityTypeEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_missed_entity_nested(self, base_sequence_nested):
-        """Test case: One entity is missed in prediction."""
+        """Test case: First level entity is missed in prediction."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[1:]
 
@@ -372,7 +376,7 @@ class TestEntityTypeEvaluation:
         assert result.spurious == 0
 
     def test_wrong_label_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong label."""
+        """Test case: Nested entity with wrong label."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].label = "DATE"
@@ -411,7 +415,7 @@ class TestEntityTypeEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_boundary_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong boundary."""
+        """Test case: Nested entity with wrong boundary."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].end = 30
@@ -492,6 +496,7 @@ class TestExactEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested(self, base_sequence_nested):
+        """Test case: Perfect match of all entities with nested entities."""
         evaluator = ExactEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
@@ -509,6 +514,7 @@ class TestExactEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested_reverse_order(self, base_sequence_nested):
+        """Test case: Perfect match of all entities in reverse order, with nested entities."""
         evaluator = ExactEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
@@ -545,7 +551,7 @@ class TestExactEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_missed_entity_nested(self, base_sequence_nested):
-        """Test case: One entity is missed in prediction."""
+        """Test case: First level entity is missed in prediction."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[1:]
 
@@ -583,7 +589,7 @@ class TestExactEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_label_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong label."""
+        """Test case: Nested entity with wrong label."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].label = "DATE"
@@ -622,7 +628,7 @@ class TestExactEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_boundary_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong boundary."""
+        """Test case: Nested entity with wrong boundary."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].end = 30
@@ -703,6 +709,7 @@ class TestPartialEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested(self, base_sequence_nested):
+        """Test case: Perfect match of all entities with nested entities."""
         evaluator = PartialEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
@@ -720,6 +727,7 @@ class TestPartialEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_perfect_match_nested_reverse_order(self, base_sequence_nested):
+        """Test case: Perfect match of all entities in reverse order, with nested entities."""
         evaluator = PartialEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
@@ -756,7 +764,7 @@ class TestPartialEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_missed_entity_nested(self, base_sequence_nested):
-        """Test case: One entity is missed in prediction."""
+        """Test case: First level entity is missed in prediction."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[1:]
 
@@ -794,7 +802,7 @@ class TestPartialEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_label_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong label."""
+        """Test case: Nested entity with wrong label."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].label = "DATE"
@@ -833,7 +841,7 @@ class TestPartialEvaluation:
         assert result_indices.spurious_indices == []
 
     def test_wrong_boundary_nested(self, base_sequence_nested):
-        """Test case: Entity with wrong boundary."""
+        """Test case: Nested entity with wrong boundary."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].end = 30
