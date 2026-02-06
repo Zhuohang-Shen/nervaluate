@@ -42,18 +42,18 @@ class EvaluationStrategy(ABC):
         return (overlap_span / true_span) * 100.0
 
     @staticmethod
-    def _calculate_boundaries_mean_gap(pred: Entity, true: Entity) -> float:
+    def _calculate_boundaries_distance(pred: Entity, true: Entity) -> float:
         """
-        Calculate mean gap between predicted and true entities boundaries.
+        Calculate distance between predicted and true entities boundaries.
 
         Returns:
-            Mean gap between predicted and true boundaries
+            Distance between predicted and true boundaries
         """
         # Calculate boundaries gaps
-        gap_starts = abs(pred.start - true.start)
-        gap_ends = abs(pred.end - true.end)
+        distance_starts = abs(pred.start - true.start)
+        distance_ends = abs(pred.end - true.end)
 
-        return (gap_starts + gap_ends) / 2
+        return distance_starts + distance_ends
 
     def _has_sufficient_overlap(self, pred: Entity, true: Entity) -> bool:
         """Check if entities have sufficient overlap based on threshold."""
@@ -132,7 +132,7 @@ class PartialEvaluation(EvaluationStrategy):
     Partial evaluation strategy - allows for partial matches.
 
     If there's a predicted entity that perfectly matches a true entity, we mark it as correct.
-    If there's a predicted entity that doesn't match any true entity and that has some minimum 
+    If there's a predicted entity that doesn't match any true entity and that has some minimum
     overlap with a true entity we mark it as partial.
     If there's a predicted entity that doesn't match any true entity, we mark it as spurious.
     If there's a true entity that doesn't match any predicted entity, we mark it as missed.
@@ -193,10 +193,10 @@ class EntityTypeEvaluation(EvaluationStrategy):
     In in strategy, we check for overlap between the predicted entity and the true entity.
 
     If there's a predicted entity that perfectly matches or only some minimum overlap with a
-    true entity, and the same label, we mark it as correct. If there are multiple entities 
+    true entity, and the same label, we mark it as correct. If there are multiple entities
     with at least some minimum overlap, we mark as correct the one with boundaries closest to
     a true entity.
-    If there's a predicted entity that doesn't match any true entity and that has some minimum 
+    If there's a predicted entity that doesn't match any true entity and that has some minimum
     overlap or perfectly matches but has the wrong label we mark it as inccorrect.
     If there's a predicted entity that doesn't match any true entity, we mark it as spurious.
     If there's a true entity that doesn't match any predicted entity, we mark it as missed.
@@ -213,7 +213,7 @@ class EntityTypeEvaluation(EvaluationStrategy):
         for pred_idx, pred in enumerate(pred_entities):
             found_match = False
             found_incorrect = False
-            current_match_boundaries_gap = None
+            current_match_boundaries_distance = None
 
             for true_idx, true in enumerate(true_entities):
                 if true_idx in matched_true:
@@ -221,12 +221,15 @@ class EntityTypeEvaluation(EvaluationStrategy):
 
                 # Check for sufficient overlap with min threshold
                 if self._has_sufficient_overlap(pred, true):
-                    boundaries_mean_gap = self._calculate_boundaries_mean_gap(pred, true)
+                    boundaries_distance = self._calculate_boundaries_distance(pred, true)
                     if pred.label == true.label:
-                        if current_match_boundaries_gap == None or boundaries_mean_gap < current_match_boundaries_gap:
+                        if (
+                            current_match_boundaries_distance == None
+                            or boundaries_distance < current_match_boundaries_distance
+                        ):
                             correct_true_idx = true_idx
                             correct_pred_idx = pred_idx
-                            current_match_boundaries_gap = boundaries_mean_gap
+                            current_match_boundaries_distance = boundaries_distance
                             found_match = True
 
                     elif not found_incorrect:
@@ -261,7 +264,7 @@ class ExactEvaluation(EvaluationStrategy):
     Exact evaluation strategy - exact boundary match over the surface string, regardless of the type.
 
     If there's a predicted entity that perfectly matches a true entity, regardless of the label, we mark it as correct.
-    If there's a predicted entity that doesn't match any true entity and that has only some minimum 
+    If there's a predicted entity that doesn't match any true entity and that has only some minimum
     overlap with a true entity, we mark it as incorrect.
     If there's a predicted entity that doesn't match any true entity, we mark it as spurious.
     If there's a true entity that doesn't match any predicted entity, we mark it as missed.
