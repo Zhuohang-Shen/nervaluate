@@ -52,8 +52,8 @@ class EvaluationStrategy(ABC):
         # Calculate boundaries gaps
         gap_starts = abs(pred.start - true.start)
         gap_ends = abs(pred.end - true.end)
-        
-        return (gap_starts + gap_ends)/2
+
+        return (gap_starts + gap_ends) / 2
 
     def _has_sufficient_overlap(self, pred: Entity, true: Entity) -> bool:
         """Check if entities have sufficient overlap based on threshold."""
@@ -117,7 +117,7 @@ class StrictEvaluation(EvaluationStrategy):
                 else:
                     result.spurious += 1
                     indices.spurious_indices.append((instance_index, pred_idx))
-                
+
         for true_idx, true in enumerate(true_entities):
             if true_idx not in matched_true:
                 result.missed += 1
@@ -166,7 +166,7 @@ class PartialEvaluation(EvaluationStrategy):
                         partial_pred_idx = pred_idx
                         partial_true_idx = true_idx
                         found_partial = True
-                    
+
             if not found_match:
                 if found_partial:
                     result.partial += 1
@@ -218,7 +218,7 @@ class EntityTypeEvaluation(EvaluationStrategy):
 
                 # Check for sufficient overlap with min threshold
                 if self._has_sufficient_overlap(pred, true):
-                    boundaries_mean_gap = self._calculate_boundaries_mean_gap(pred,true)
+                    boundaries_mean_gap = self._calculate_boundaries_mean_gap(pred, true)
                     if pred.label == true.label:
                         if current_match_boundaries_gap == None or boundaries_mean_gap < current_match_boundaries_gap:
                             correct_true_idx = true_idx

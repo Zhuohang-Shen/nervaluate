@@ -1,7 +1,8 @@
-import pytest
 from copy import deepcopy
+import pytest
 from nervaluate.entities import Entity
 from nervaluate.strategies import EntityTypeEvaluation, ExactEvaluation, PartialEvaluation, StrictEvaluation
+
 
 def create_entities_from_bio(bio_tags):
     """Helper function to create entities from BIO tags."""
@@ -28,10 +29,12 @@ def create_entities_from_bio(bio_tags):
 
     return entities
 
+
 @pytest.fixture
 def base_sequence():
     """Base sequence: 'The John Smith who works at Google Inc'"""
     return ["O", "B-PER", "I-PER", "O", "O", "O", "B-ORG", "I-ORG"]
+
 
 @pytest.fixture
 def base_sequence_nested():
@@ -41,12 +44,13 @@ def base_sequence_nested():
     third_level_entity: Westphalia
     other_entity: 1648
     """
-    first_level_entity = Entity("EVENT",4,37)
-    second_level_entity = Entity("EVENT",4,24)
-    third_level_entity = Entity("LOCATION",14,24)
-    other_entity = Entity("DATE",51,55)
+    first_level_entity = Entity("EVENT", 4, 37)
+    second_level_entity = Entity("EVENT", 4, 24)
+    third_level_entity = Entity("LOCATION", 14, 24)
+    other_entity = Entity("DATE", 51, 55)
 
-    return [first_level_entity,second_level_entity,third_level_entity,other_entity]
+    return [first_level_entity, second_level_entity, third_level_entity, other_entity]
+
 
 class TestStrictEvaluation:
     """Test cases for strict evaluation strategy."""
@@ -74,7 +78,7 @@ class TestStrictEvaluation:
         evaluator = StrictEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -91,7 +95,7 @@ class TestStrictEvaluation:
         evaluator = StrictEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -122,14 +126,14 @@ class TestStrictEvaluation:
         assert result_indices.partial_indices == []
         assert result_indices.missed_indices == [(0, 1)]
         assert result_indices.spurious_indices == []
-    
+
     def test_missed_entity_nested(self, base_sequence_nested):
         """Test case: One entity is missed in prediction."""
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[1:]
 
         evaluator = StrictEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 0
@@ -168,7 +172,7 @@ class TestStrictEvaluation:
         pred[1].label = "DATE"
 
         evaluator = StrictEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 1
@@ -207,7 +211,7 @@ class TestStrictEvaluation:
         pred[1].end = 30
 
         evaluator = StrictEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 1
@@ -285,7 +289,7 @@ class TestEntityTypeEvaluation:
         evaluator = EntityTypeEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -302,7 +306,7 @@ class TestEntityTypeEvaluation:
         evaluator = EntityTypeEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -340,7 +344,7 @@ class TestEntityTypeEvaluation:
         pred = deepcopy(base_sequence_nested)[1:]
 
         evaluator = EntityTypeEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 0
@@ -374,7 +378,7 @@ class TestEntityTypeEvaluation:
         pred[1].label = "DATE"
 
         evaluator = EntityTypeEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 1
@@ -413,7 +417,7 @@ class TestEntityTypeEvaluation:
         pred[1].end = 30
 
         evaluator = EntityTypeEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -486,12 +490,12 @@ class TestExactEvaluation:
         assert result_indices.partial_indices == []
         assert result_indices.missed_indices == []
         assert result_indices.spurious_indices == []
-    
+
     def test_perfect_match_nested(self, base_sequence_nested):
         evaluator = ExactEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -508,7 +512,7 @@ class TestExactEvaluation:
         evaluator = ExactEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -546,7 +550,7 @@ class TestExactEvaluation:
         pred = deepcopy(base_sequence_nested)[1:]
 
         evaluator = ExactEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 0
@@ -585,7 +589,7 @@ class TestExactEvaluation:
         pred[1].label = "DATE"
 
         evaluator = ExactEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -624,7 +628,7 @@ class TestExactEvaluation:
         pred[1].end = 30
 
         evaluator = ExactEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 1
@@ -702,7 +706,7 @@ class TestPartialEvaluation:
         evaluator = PartialEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -719,7 +723,7 @@ class TestPartialEvaluation:
         evaluator = PartialEvaluation()
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)[::-1]
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -757,7 +761,7 @@ class TestPartialEvaluation:
         pred = deepcopy(base_sequence_nested)[1:]
 
         evaluator = PartialEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 0
@@ -796,7 +800,7 @@ class TestPartialEvaluation:
         pred[1].label = "DATE"
 
         evaluator = PartialEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 4
         assert result.incorrect == 0
@@ -835,7 +839,7 @@ class TestPartialEvaluation:
         pred[1].end = 30
 
         evaluator = PartialEvaluation()
-        result, result_indices = evaluator.evaluate(true, pred, ['EVENT','LOCATION','DATE'])
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
 
         assert result.correct == 3
         assert result.incorrect == 0
