@@ -104,21 +104,20 @@ class StrictEvaluation(EvaluationStrategy):
                     found_match = True
                     break
                 # Check for sufficient overlap with min threshold
-                if self._has_sufficient_overlap(pred, true):
-                    if not found_incorrect:
-                        incorrect_true_idx = true_idx
-                        inccorrect_pred_idx = pred_idx
+                if self._has_sufficient_overlap(pred, true) and not found_incorrect:
+                    incorrect_true_idx = true_idx
+                    incorrect_pred_idx = pred_idx
                     found_incorrect = True
 
-            if not found_match and found_incorrect:
-                result.incorrect += 1
-                indices.incorrect_indices.append((instance_index, inccorrect_pred_idx))
-                matched_true.add(incorrect_true_idx)
-
-            if not found_match and not found_incorrect:
-                result.spurious += 1
-                indices.spurious_indices.append((instance_index, pred_idx))
-
+            if not found_match:
+                if found_incorrect:
+                    result.incorrect += 1
+                    indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
+                    matched_true.add(incorrect_true_idx)
+                else:
+                    result.spurious += 1
+                    indices.spurious_indices.append((instance_index, pred_idx))
+                
         for true_idx, true in enumerate(true_entities):
             if true_idx not in matched_true:
                 result.missed += 1
@@ -168,14 +167,14 @@ class PartialEvaluation(EvaluationStrategy):
                         partial_true_idx = true_idx
                         found_partial = True
                     
-            if not found_match and found_partial:
-                result.partial += 1
-                indices.partial_indices.append((instance_index, partial_pred_idx))
-                matched_true.add(partial_true_idx)
-
-            if not found_match and not found_partial:
-                result.spurious += 1
-                indices.spurious_indices.append((instance_index, pred_idx))
+            if not found_match:
+                if found_partial:
+                    result.partial += 1
+                    indices.partial_indices.append((instance_index, partial_pred_idx))
+                    matched_true.add(partial_true_idx)
+                else:
+                    result.spurious += 1
+                    indices.spurious_indices.append((instance_index, pred_idx))
 
         for true_idx, true in enumerate(true_entities):
             if true_idx not in matched_true:
@@ -236,15 +235,14 @@ class EntityTypeEvaluation(EvaluationStrategy):
                 result.correct += 1
                 indices.correct_indices.append((instance_index, correct_pred_idx))
                 matched_true.add(correct_true_idx)
-
-            if not found_match and found_incorrect:
-                result.incorrect += 1
-                indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
-                matched_true.add(incorrect_true_idx)
-
-            if not found_match and not found_incorrect:
-                result.spurious += 1
-                indices.spurious_indices.append((instance_index, pred_idx))
+            else:
+                if found_incorrect:
+                    result.incorrect += 1
+                    indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
+                    matched_true.add(incorrect_true_idx)
+                else:
+                    result.spurious += 1
+                    indices.spurious_indices.append((instance_index, pred_idx))
 
         for true_idx, true in enumerate(true_entities):
             if true_idx not in matched_true:
@@ -292,20 +290,19 @@ class ExactEvaluation(EvaluationStrategy):
                     found_match = True
                     break
                 # Check for sufficient overlap with min threshold
-                if self._has_sufficient_overlap(pred, true):
-                    if not found_incorrect:
-                        incorrect_true_idx = true_idx
-                        incorrect_pred_idx = pred_idx
+                if self._has_sufficient_overlap(pred, true) and not found_incorrect:
+                    incorrect_true_idx = true_idx
+                    incorrect_pred_idx = pred_idx
                     found_incorrect = True
 
-            if not found_match and found_incorrect:
-                result.incorrect += 1
-                indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
-                matched_true.add(incorrect_true_idx)
-
-            if not found_match and not found_incorrect:
-                result.spurious += 1
-                indices.spurious_indices.append((instance_index, pred_idx))
+            if not found_match:
+                if found_incorrect:
+                    result.incorrect += 1
+                    indices.incorrect_indices.append((instance_index, incorrect_pred_idx))
+                    matched_true.add(incorrect_true_idx)
+                else:
+                    result.spurious += 1
+                    indices.spurious_indices.append((instance_index, pred_idx))
 
         for true_idx, true in enumerate(true_entities):
             if true_idx not in matched_true:
