@@ -201,7 +201,11 @@ class EntityTypeEvaluation(EvaluationStrategy):
     If there's a predicted entity that doesn't match any true entity, we mark it as spurious.
     If there's a true entity that doesn't match any predicted entity, we mark it as missed.
 
+    When multiple true entities of the same label overlap a prediction, the match is chosen by
+    closest boundaries (minimum sum of start and end offset differences), so which true entity
+    is considered "missed" may differ from list order.
     """
+
 
     def evaluate(
         self, true_entities: List[Entity], pred_entities: List[Entity], tags: List[str], instance_index: int = 0
