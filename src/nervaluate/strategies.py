@@ -197,7 +197,7 @@ class EntityTypeEvaluation(EvaluationStrategy):
     with at least some minimum overlap, we mark as correct the one with boundaries closest to
     a true entity.
     If there's a predicted entity that doesn't match any true entity and that has some minimum
-    overlap or perfectly matches but has the wrong label we mark it as inccorrect.
+    overlap or perfectly matches but has the wrong label we mark it as incorrect.
     If there's a predicted entity that doesn't match any true entity, we mark it as spurious.
     If there's a true entity that doesn't match any predicted entity, we mark it as missed.
 
