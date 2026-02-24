@@ -163,7 +163,7 @@ class PartialEvaluation(EvaluationStrategy):
                         matched_true.add(true_idx)
                         found_match = True
                         break
-                    elif not found_partial:
+                    if not found_partial:
                         partial_pred_idx = pred_idx
                         partial_true_idx = true_idx
                         found_partial = True
@@ -190,7 +190,7 @@ class EntityTypeEvaluation(EvaluationStrategy):
     """
     Entity type evaluation strategy - only checks entity types.
 
-    In in strategy, we check for overlap between the predicted entity and the true entity.
+    In strategy, we check for overlap between the predicted entity and the true entity.
 
     If there's a predicted entity that perfectly matches or only some minimum overlap with a
     true entity, and the same label, we mark it as correct. If there are multiple entities
@@ -224,7 +224,7 @@ class EntityTypeEvaluation(EvaluationStrategy):
                     boundaries_distance = self._calculate_boundaries_distance(pred, true)
                     if pred.label == true.label:
                         if (
-                            current_match_boundaries_distance == None
+                            current_match_boundaries_distance is None
                             or boundaries_distance < current_match_boundaries_distance
                         ):
                             correct_true_idx = true_idx
