@@ -38,7 +38,9 @@ def base_sequence():
 
 @pytest.fixture
 def base_sequence_nested():
-    """Base sequence: 'The Treaty of Westphalia negotiations concluded in 1648.'
+    """
+    Base sequence: 'The Treaty of Westphalia negotiations concluded in 1648.'
+
     first_level_entity: Treaty of Westphalia negotiations
     second_level_entity: Treaty of Westphalia
     third_level_entity: Westphalia
@@ -211,6 +213,45 @@ class TestStrictEvaluation:
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].end = 30
+
+        evaluator = StrictEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
+
+        assert result.correct == 3
+        assert result.incorrect == 1
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == [(0, 1)]
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
+    def test_extra_entity_nested(self, base_sequence_nested):
+        """Test case: Extra (spurious) entity in prediction with nested entities (Scenario II)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested) + [Entity("MISC", 60, 65)]
+
+        evaluator = StrictEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE", "MISC"])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 1
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == [(0, 4)]
+
+    def test_wrong_boundary_and_label_nested(self, base_sequence_nested):
+        """Test case: Nested entity with wrong boundary and wrong label (Scenario VI)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        pred[1] = Entity("DATE", 4, 30)
 
         evaluator = StrictEvaluation()
         result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
@@ -434,6 +475,45 @@ class TestEntityTypeEvaluation:
         assert result_indices.missed_indices == []
         assert result_indices.spurious_indices == []
 
+    def test_extra_entity_nested(self, base_sequence_nested):
+        """Test case: Extra (spurious) entity in prediction with nested entities (Scenario II)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested) + [Entity("MISC", 60, 65)]
+
+        evaluator = EntityTypeEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE", "MISC"])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 1
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == [(0, 4)]
+
+    def test_wrong_boundary_and_label_nested(self, base_sequence_nested):
+        """Test case: Nested entity with wrong boundary and wrong label (Scenario VI)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        pred[1] = Entity("DATE", 4, 30)
+
+        evaluator = EntityTypeEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
+
+        assert result.correct == 3
+        assert result.incorrect == 1
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == [(0, 1)]
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
     def test_shifted_boundary(self, base_sequence):
         """Test case: Entity with shifted boundary."""
         true = create_entities_from_bio(base_sequence)
@@ -647,6 +727,45 @@ class TestExactEvaluation:
         assert result_indices.missed_indices == []
         assert result_indices.spurious_indices == []
 
+    def test_extra_entity_nested(self, base_sequence_nested):
+        """Test case: Extra (spurious) entity in prediction with nested entities (Scenario II)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested) + [Entity("MISC", 60, 65)]
+
+        evaluator = ExactEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE", "MISC"])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 1
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == [(0, 4)]
+
+    def test_wrong_boundary_and_label_nested(self, base_sequence_nested):
+        """Test case: Nested entity with wrong boundary and wrong label (Scenario VI)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        pred[1] = Entity("DATE", 4, 30)
+
+        evaluator = ExactEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
+
+        assert result.correct == 3
+        assert result.incorrect == 1
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == [(0, 1)]
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
     def test_shifted_boundary(self, base_sequence):
         """Test case: Entity with shifted boundary."""
         true = create_entities_from_bio(base_sequence)
@@ -845,6 +964,45 @@ class TestPartialEvaluation:
         true = base_sequence_nested
         pred = deepcopy(base_sequence_nested)
         pred[1].end = 30
+
+        evaluator = PartialEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
+
+        assert result.correct == 3
+        assert result.incorrect == 0
+        assert result.partial == 1
+        assert result.missed == 0
+        assert result.spurious == 0
+        assert result_indices.correct_indices == [(0, 0), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == [(0, 1)]
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == []
+
+    def test_extra_entity_nested(self, base_sequence_nested):
+        """Test case: Extra (spurious) entity in prediction with nested entities (Scenario II)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested) + [Entity("MISC", 60, 65)]
+
+        evaluator = PartialEvaluation()
+        result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE", "MISC"])
+
+        assert result.correct == 4
+        assert result.incorrect == 0
+        assert result.partial == 0
+        assert result.missed == 0
+        assert result.spurious == 1
+        assert result_indices.correct_indices == [(0, 0), (0, 1), (0, 2), (0, 3)]
+        assert result_indices.incorrect_indices == []
+        assert result_indices.partial_indices == []
+        assert result_indices.missed_indices == []
+        assert result_indices.spurious_indices == [(0, 4)]
+
+    def test_wrong_boundary_and_label_nested(self, base_sequence_nested):
+        """Test case: Nested entity with wrong boundary and wrong label (Scenario VI)."""
+        true = base_sequence_nested
+        pred = deepcopy(base_sequence_nested)
+        pred[1] = Entity("DATE", 4, 30)
 
         evaluator = PartialEvaluation()
         result, result_indices = evaluator.evaluate(true, pred, ["EVENT", "LOCATION", "DATE"])
